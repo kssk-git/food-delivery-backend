@@ -1,7 +1,11 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.RestaurantReqDto;
+import com.example.demo.dto.RestaurantRespDto;
 import com.example.demo.entity.Restaurant;
 import com.example.demo.repository.RestaurantRepository;
+import com.example.demo.service.RestaurantService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,44 +13,37 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/restaurants")
 public class RestaurantController {
-    private RestaurantRepository repository;
+    private RestaurantService restaurantService;
 
-    public RestaurantController(RestaurantRepository repository) {
-        this.repository = repository;
+    public RestaurantController(RestaurantService restaurantService) {
+        this.restaurantService = restaurantService;
     }
 
     @PostMapping
-    public Restaurant add(@RequestBody Restaurant r){
-      return   repository.save(r);
+    public RestaurantRespDto add(@Valid @RequestBody RestaurantReqDto request){
+      return  restaurantService.createRestaurant(request);
     }
 
     @GetMapping("/{id}")
-    public Restaurant getone(@PathVariable Long id){
-        return repository.findById(id)
-                .orElseThrow(() ->new RuntimeException("not found"+id) );
+    public RestaurantRespDto getone(@PathVariable Long id){
+        return restaurantService.getRestaurant(id);
     }
 
     @GetMapping
-    public List<Restaurant> findall(){
-        return repository.findAll();
+    public List<RestaurantRespDto> findall(){
+        return restaurantService.getall();
     }
 
     @PutMapping("/{id}")
-    public Restaurant update(@RequestBody Restaurant request,
+    public RestaurantRespDto update(@Valid @RequestBody RestaurantReqDto request,
                              @PathVariable Long id){
-        Restaurant existing = repository.findById(id)
-                .orElseThrow(() ->new RuntimeException("not found"+id) );
-
-        existing.setCity(request.getCity());
-        existing.setName(request.getName());
-
-        return repository.save(existing);
+       return restaurantService.update(request,id);
 
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id){
-        repository.deleteById(id);
+        restaurantService.deleting(id);
         return "done";
     }
 }

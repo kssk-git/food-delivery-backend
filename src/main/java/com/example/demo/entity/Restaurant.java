@@ -12,6 +12,7 @@ public class Restaurant {
     private Long id;
     private String name;
     private String city;
+    public Restaurant(){}
 
     public Restaurant(String city, Long id, String name) {
         this.city = city;

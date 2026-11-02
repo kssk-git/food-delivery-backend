@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.AuthRespDto;
+import com.example.demo.dto.LoginReqDto;
 import com.example.demo.dto.RegisterReqDto;
 import com.example.demo.dto.UserRespDto;
 import jakarta.validation.Valid;
@@ -21,5 +23,10 @@ public class AuthController {
     @PostMapping("/register")
     public UserRespDto register(@Valid @RequestBody RegisterReqDto request) {
         return authService.register(request);
+    }
+
+    @PostMapping("/login")
+    public AuthRespDto login(@Valid @RequestBody LoginReqDto request) {
+        return authService.login(request);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+import com.example.demo.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,6 +17,8 @@ import jakarta.validation.constraints.Size;
         @NotBlank(message = "Password is required")
         @Size(min = 6, message = "Password must be at least 6 characters")
         private String password;
+
+        private Role role;
 
         public String getName() {
             return name;
@@ -39,6 +42,14 @@ import jakarta.validation.constraints.Size;
 
         public void setPassword(String password) {
             this.password = password;
+        }
+
+        public Role getRole() {
+            return role;
+        }
+
+        public void setRole(Role role) {
+            this.role = role;
         }
     }
 

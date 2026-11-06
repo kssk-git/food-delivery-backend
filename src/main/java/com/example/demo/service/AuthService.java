@@ -4,7 +4,9 @@ import com.example.demo.dto.AuthRespDto;
 import com.example.demo.dto.LoginReqDto;
 import com.example.demo.dto.RegisterReqDto;
 import com.example.demo.dto.UserRespDto;
+import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
+import com.example.demo.exception.BadRequestException;
 import com.example.demo.exception.DuplicateResourceException;
 import com.example.demo.exception.InvalidCredentialsException;
 import com.example.demo.mapper.UserMapper;
@@ -29,14 +31,23 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
+
     public UserRespDto register(RegisterReqDto request) {
         if (repository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Email already registered: " + request.getEmail());
         }
+
+        Role role = request.getRole() == null ? Role.CUSTOMER : request.getRole();
+        if (role == Role.ADMIN) {
+            throw new BadRequestException("Cannot register as ADMIN");
+        }
+
         String encoded = passwordEncoder.encode(request.getPassword());
-        User saved = repository.save(mapper.mapToEntity(request, encoded));
+        User saved = repository.save(mapper.mapToEntity(request, encoded, role));
         return mapper.mapToDto(saved);
     }
+
+
     public AuthRespDto login(LoginReqDto request) {
         User user = repository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));

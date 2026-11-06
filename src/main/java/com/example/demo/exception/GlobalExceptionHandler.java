@@ -27,4 +27,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleDuplicate(DuplicateResourceException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
+    @ExceptionHandler(BadRequestException.class)
+    public  ResponseEntity<String> badRequest(BadRequestException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
 }

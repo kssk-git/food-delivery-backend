@@ -6,6 +6,7 @@ import com.example.demo.entity.Restaurant;
 import com.example.demo.repository.RestaurantRepository;
 import com.example.demo.service.RestaurantService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +21,8 @@ public class RestaurantController {
     }
 
     @PostMapping
-    public RestaurantRespDto add(@Valid @RequestBody RestaurantReqDto request){
-      return  restaurantService.createRestaurant(request);
+    public RestaurantRespDto add(@Valid @RequestBody RestaurantReqDto request, Authentication authentication){
+      return  restaurantService.createRestaurant(request,authentication.getName());
     }
 
     @GetMapping("/{id}")
@@ -36,14 +37,14 @@ public class RestaurantController {
 
     @PutMapping("/{id}")
     public RestaurantRespDto update(@Valid @RequestBody RestaurantReqDto request,
-                             @PathVariable Long id){
-       return restaurantService.update(request,id);
+                             @PathVariable Long id,Authentication authentication){
+       return restaurantService.update(request,id,authentication);
 
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id){
-        restaurantService.deleting(id);
+    public String delete(@PathVariable Long id,Authentication authentication){
+        restaurantService.deleting(id,authentication);
         return "done";
     }
 }

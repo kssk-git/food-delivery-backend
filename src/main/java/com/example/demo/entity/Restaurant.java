@@ -1,9 +1,6 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Restaurant {
@@ -13,6 +10,10 @@ public class Restaurant {
     private String name;
     private String city;
     public Restaurant(){}
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
 
     public Restaurant(String city, Long id, String name) {
         this.city = city;
@@ -42,5 +43,13 @@ public class Restaurant {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 }

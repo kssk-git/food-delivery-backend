@@ -9,6 +9,8 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.MenuMapper;
 import com.example.demo.repository.MenuRepository;
 import com.example.demo.repository.RestaurantRepository;
+import com.example.demo.security.OwnershipChecker;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,18 +19,35 @@ public class MenuService {
     private MenuRepository repository;
     private MenuMapper mapper;
     private RestaurantRepository restaurantRepository;
-    public MenuService(MenuRepository repository, MenuMapper mapper,RestaurantRepository restaurantRepository) {
+    private OwnershipChecker ownershipChecker;
+    public MenuService(MenuRepository repository, MenuMapper mapper,RestaurantRepository restaurantRepository,OwnershipChecker ownershipChecker) {
         this.repository = repository;
         this.mapper = mapper;
         this.restaurantRepository=restaurantRepository;
+        this.ownershipChecker= ownershipChecker;
     }
 
 
-    public MenuRespDto add(MenuReqDto request,Long restaurandId){
-        Restaurant restaurant=restaurantRepository.findById(restaurandId).orElseThrow(() -> new ResourceNotFoundException("resource not found"));
-        Menu menu = mapper.mapToEntity(request,restaurant);
-        Menu response = repository.save(menu);
-        return mapper.mapToDto(response);
+
+    public MenuRespDto add(MenuReqDto request, Long restaurantId, Authentication auth) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found: " + restaurantId));
+        ownershipChecker.check(restaurant, auth);    // new line
+        Menu saved = repository.save(mapper.mapToEntity(request, restaurant));
+        return mapper.mapToDto(saved);
+    }
+
+    public MenuRespDto update(MenuReqDto request, Long id, Long restaurantId, Authentication auth) {
+        Menu existing = findMenu(id, restaurantId);
+        ownershipChecker.check(existing.getRestaurant(), auth);   // new line
+        mapper.updateEntity(existing, request);
+        return mapper.mapToDto(repository.save(existing));
+    }
+
+    public void delete(Long id, Long restaurantId, Authentication auth) {
+        Menu existing = findMenu(id, restaurantId);
+        ownershipChecker.check(existing.getRestaurant(), auth);   // new line
+        repository.delete(existing);
     }
 
     public MenuRespDto getRestaurant(Long id){
@@ -46,15 +65,7 @@ public class MenuService {
 
     }
 
-    public MenuRespDto update(MenuReqDto request , Long id,Long restaurantId){
-        Menu existing = findMenu(id,restaurantId);
-        mapper.updateEntity(existing,request);
-        return mapper.mapToDto(repository.save(existing));
-    }
 
-    public void deleting(Long id,Long restaurantId){
-        repository.delete(findMenu(id,restaurantId));
-    }
 
     private Menu findMenu(Long id,Long restaurantId){
         return repository.findByIdAndRestaurantId(id, restaurantId)

@@ -1,9 +1,10 @@
-package com.example.demo.service;
+package com.example.demo.controller;
 
 import com.example.demo.dto.AuthRespDto;
 import com.example.demo.dto.LoginReqDto;
 import com.example.demo.dto.RegisterReqDto;
 import com.example.demo.dto.UserRespDto;
+import com.example.demo.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

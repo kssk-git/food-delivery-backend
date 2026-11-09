@@ -30,6 +30,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**", "/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/restaurants/**").permitAll()
                         .requestMatchers("/api/restaurants/**").hasAnyRole("RESTAURANT_OWNER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/*/status")
+                        .hasAnyRole("RESTAURANT_OWNER", "ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))

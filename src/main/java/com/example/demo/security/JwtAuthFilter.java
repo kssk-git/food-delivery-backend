@@ -46,7 +46,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (JwtException | IllegalArgumentException e) {
-                // bad or expired token: continue without logging the user in
             }
         }
         chain.doFilter(request, response);

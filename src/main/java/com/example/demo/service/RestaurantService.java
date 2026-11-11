@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.PageRespDto;
 import com.example.demo.dto.RestaurantReqDto;
 import com.example.demo.dto.RestaurantRespDto;
 import com.example.demo.entity.Restaurant;
@@ -9,6 +10,10 @@ import com.example.demo.mapper.RestaurantMapper;
 import com.example.demo.repository.RestaurantRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.OwnershipChecker;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -46,12 +51,21 @@ public class RestaurantService {
         return mapper.mapToDto(response);
     }
 
-    public List<RestaurantRespDto> getall(){
-        //Restaurant response = repository.findAll();
-        return repository.findAll().stream()
-                .map(mapper::mapToDto)
-                .toList();
+    public PageRespDto<RestaurantRespDto> getAll(String city, int page, int size, String sortBy) {
+        int safeSize = Math.min(Math.max(size, 1), 50);
+        Pageable pageable = PageRequest.of(Math.max(page, 0), safeSize, Sort.by(sortBy));
 
+        Page<Restaurant> result = (city == null || city.isBlank())
+                ? repository.findAll(pageable)
+                : repository.findByCityIgnoreCase(city, pageable);
+
+        PageRespDto<RestaurantRespDto> response = new PageRespDto<>();
+        response.setContent(result.getContent().stream().map(mapper::mapToDto).toList());
+        response.setPage(result.getNumber());
+        response.setSize(result.getSize());
+        response.setTotalElements(result.getTotalElements());
+        response.setTotalPages(result.getTotalPages());
+        return response;
     }
 
     public RestaurantRespDto update(RestaurantReqDto request , Long id, Authentication auth){

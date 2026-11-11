@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.PageRespDto;
 import com.example.demo.dto.RestaurantReqDto;
 import com.example.demo.dto.RestaurantRespDto;
 import com.example.demo.entity.Restaurant;
@@ -31,8 +32,12 @@ public class RestaurantController {
     }
 
     @GetMapping
-    public List<RestaurantRespDto> findall(){
-        return restaurantService.getall();
+    public PageRespDto<RestaurantRespDto> getAll(
+            @RequestParam(required = false) String city,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy) {
+        return restaurantService.getAll(city, page, size, sortBy);
     }
 
     @PutMapping("/{id}")
